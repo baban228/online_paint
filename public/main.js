@@ -32,9 +32,6 @@ function draw(e) {
 
     [lastX, lastY] = [e.offsetX, e.offsetY];
 
-    // Сохраняем данные о рисовании в localStorage
-    saveDrawingData(e.offsetX, e.offsetY);
-
     // Отправляем данные о рисовании через BroadcastChannel
     bc.postMessage({
         type: 'draw',
@@ -49,42 +46,19 @@ function draw(e) {
     });
 }
 
-function saveDrawingData(offsetX, offsetY) {
-    let drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
-    drawingData.push({
-        lastX,
-        lastY,
-        offsetX,
-        offsetY,
-        color: colorInput.value,
-        size: sizeInput.value
-    });
-    localStorage.setItem('drawingData', JSON.stringify(drawingData));
-}
-
-function loadDrawingData() {
-    const drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
-    drawingData.forEach(data => {
-        ctx.strokeStyle = data.color;
-        ctx.lineWidth = data.size;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        ctx.beginPath();
-        ctx.moveTo(data.lastX, data.lastY);
-        ctx.lineTo(data.offsetX, data.offsetY);
-        ctx.stroke();
-    });
-}
-
-canvas.addEventListener('mousedown', (e) => {
+function startDrawing(e) {
     isDrawing = true;
     [lastX, lastY] = [e.offsetX, e.offsetY];
-});
+}
 
+function stopDrawing() {
+    isDrawing = false;
+}
+
+canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', () => isDrawing = false);
-canvas.addEventListener('mouseout', () => isDrawing = false);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
 
 colorInput.addEventListener('change', () => {
     ctx.strokeStyle = colorInput.value;
@@ -96,7 +70,6 @@ sizeInput.addEventListener('change', () => {
 
 clearButton.addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    localStorage.removeItem('drawingData');
     bc.postMessage({ type: 'clear' });
 });
 
@@ -143,4 +116,61 @@ bc.onmessage = (event) => {
 };
 
 // Загружаем сохраненные данные при загрузке страницы
+function loadDrawingData() {
+    const drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
+    drawingData.forEach(data => {
+        ctx.strokeStyle = data.color;
+        ctx.lineWidth = data.size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(data.lastX, data.lastY);
+        ctx.lineTo(data.offsetX, data.offsetY);
+        ctx.stroke();
+    });
+}
+
+// Сохраняем данные о рисовании в localStorage
+function saveDrawingData(lastX, lastY, offsetX, offsetY, color, size) {
+    let drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
+    drawingData.push({
+        lastX,
+        lastY,
+        offsetX,
+        offsetY,
+        color,
+        size
+    });
+    localStorage.setItem('drawingData', JSON.stringify(drawingData));
+}
+
+// Очищаем данные в localStorage
+function clearDrawingData() {
+    localStorage.removeItem('drawingData');
+}
+
+// Загружаем сохраненные данные при загрузке страницы
 loadDrawingData();
+
+// Обрабатываем события от других вкладок
+bc.onmessage = (event) => {
+    const { type, data } = event.data;
+    if (type === 'draw') {
+        ctx.strokeStyle = data.color;
+        ctx.lineWidth = data.size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(data.lastX, data.lastY);
+        ctx.lineTo(data.offsetX, data.offsetY);
+        ctx.stroke();
+
+        // Сохраняем данные о рисовании в localStorage
+        saveDrawingData(data.lastX, data.lastY, data.offsetX, data.offsetY, data.color, data.size);
+    } else if (type === 'clear') {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        clearDrawingData();
+    }
+};

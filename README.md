@@ -1,33 +1,33 @@
 **структура проекта:**
 online_paint/
-│
-├── pages/
-│   ├── index.css
-│   └── server.js
-│
-├── public/
-│   ├── index.html
-│   └── main.js
-│
-├── vendor/
-│   └── normalize.css
-│
-├── blocks/
-│   ├── canvas/
-│   │   └── canvas.css
-│   ├── body/
-│   │   └── body.css
-│   ├── controls/
-│   │   ├── controls.css
-│   │   ├── __input/
-│   │   │   └── controls__input.css
-│   │   └── __label/
-│   │       └── controls__label.css
-│   ├── login/
-│   │   ├── login.css
-│   │   └── login.html
-│
-├── package.json
-└── webpack.config.js
+│<br />
+├── pages/<br />
+│   ├── index.css<br />
+│   └── server.js<br />
+│<br />
+├── public/<br />
+│   ├── index.html<br />
+│   └── main.js<br />
+│<br />
+├── vendor/<br />
+│   └── normalize.css<br />
+│<br />
+├── blocks/<br />
+│   ├── canvas/<br />
+│   │   └── canvas.css<br />
+│   ├── body/<br />
+│   │   └── body.css<br />
+│   ├── controls/<br />
+│   │   ├── controls.css<br />
+│   │   ├── __input/<br />
+│   │   │   └── controls__input.css<br />
+│   │   └── __label/<br />
+│   │       └── controls__label.css<br />
+│   ├── login/<br />
+│   │   ├── login.css<br />
+│   │   └── login.html<br />
+│<br />
+├── package.json<br />
+└── webpack.config.js<br />
 
 **для запуска:** npm install, npm run dev

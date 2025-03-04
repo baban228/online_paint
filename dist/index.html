@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-Доска для Коллективного Рисования</title>
+    <link rel="stylesheet" href="pages/index.css">
+<script defer src="main.js"></script><link href="main.css" rel="stylesheet"></head>
+<body>
+    <div class="controls">
+        <label for="colorPicker">Цвет:</label>
+        <input type="color" id="colorPicker" value="#000000">
+        <label for="brushSize">Толщина:</label>
+        <input type="range" id="brushSize" min="1" max="50" value="5">
+    </div>
+    <canvas id="drawingCanvas" width="800" height="600"></canvas>
+    <script src="main.js"></script>
+</body>
+</html>

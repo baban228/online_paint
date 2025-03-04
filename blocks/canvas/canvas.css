@@ -1,0 +1,7 @@
+canvas {
+    border: 2px solid #000; /* Толщина и цвет рамки */
+    padding: 10px; /* Внутренний отступ внутри рамки */
+    background-color: #fff; /* Цвет фона холста */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень для эффекта выделения */
+    margin-top: 20px;
+}

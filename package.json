@@ -1,0 +1,22 @@
+{
+  "name": "online_paint",
+  "version": "1.0.0",
+  "description": "Онлайн доска для рисования",
+  "main": "pages/server.js",
+  "scripts": {
+    "start": "node pages/server.js",
+    "build": "webpack --mode production",
+    "dev": "webpack serve --mode development"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "css-loader": "^6.7.1",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.1"
+  }
+}

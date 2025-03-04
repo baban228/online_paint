@@ -15,6 +15,9 @@ let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
 
+// Создаем BroadcastChannel для синхронизации данных между вкладками
+const bc = new BroadcastChannel('drawing-channel');
+
 function draw(e) {
     if (!isDrawing) return; // Если мышь не нажата, ничего не делаем
     ctx.strokeStyle = colorInput.value;
@@ -28,6 +31,50 @@ function draw(e) {
     ctx.stroke();
 
     [lastX, lastY] = [e.offsetX, e.offsetY];
+
+    // Сохраняем данные о рисовании в localStorage
+    saveDrawingData(e.offsetX, e.offsetY);
+
+    // Отправляем данные о рисовании через BroadcastChannel
+    bc.postMessage({
+        type: 'draw',
+        data: {
+            lastX,
+            lastY,
+            offsetX: e.offsetX,
+            offsetY: e.offsetY,
+            color: colorInput.value,
+            size: sizeInput.value
+        }
+    });
+}
+
+function saveDrawingData(offsetX, offsetY) {
+    let drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
+    drawingData.push({
+        lastX,
+        lastY,
+        offsetX,
+        offsetY,
+        color: colorInput.value,
+        size: sizeInput.value
+    });
+    localStorage.setItem('drawingData', JSON.stringify(drawingData));
+}
+
+function loadDrawingData() {
+    const drawingData = JSON.parse(localStorage.getItem('drawingData')) || [];
+    drawingData.forEach(data => {
+        ctx.strokeStyle = data.color;
+        ctx.lineWidth = data.size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(data.lastX, data.lastY);
+        ctx.lineTo(data.offsetX, data.offsetY);
+        ctx.stroke();
+    });
 }
 
 canvas.addEventListener('mousedown', (e) => {
@@ -49,12 +96,13 @@ sizeInput.addEventListener('change', () => {
 
 clearButton.addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    localStorage.removeItem('drawingData');
+    bc.postMessage({ type: 'clear' });
 });
 
 loginButton.addEventListener('click', () => {
-    window.location.href = '/login';
+    window.open('/blocks/login/login.html', '_blank', 'width=400,height=300');
 });
-
 
 // Добавляем стили для кнопок через JavaScript
 document.querySelectorAll('.controls__button').forEach(button => {
@@ -75,3 +123,24 @@ document.querySelectorAll('.controls__button').forEach(button => {
         button.style.backgroundColor = '#007bff';
     });
 });
+
+// Обрабатываем сообщения от других вкладок
+bc.onmessage = (event) => {
+    const { type, data } = event.data;
+    if (type === 'draw') {
+        ctx.strokeStyle = data.color;
+        ctx.lineWidth = data.size;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(data.lastX, data.lastY);
+        ctx.lineTo(data.offsetX, data.offsetY);
+        ctx.stroke();
+    } else if (type === 'clear') {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+};
+
+// Загружаем сохраненные данные при загрузке страницы
+loadDrawingData();

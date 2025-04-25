@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +7,26 @@
     <link rel="stylesheet" href="/pages/index.css">
 </head>
 <body>
+    <div class="header">
+        <button class="controls__button" id="loginButton">Войти</button>
+    </div>
     <div class="body">
         <div class="controls">
-            <button class="controls__button" id="loginButton">Войти</button>
             <label class="controls__label" for="color">Цвет:</label>
             <input class="controls__input" type="color" id="color" value="#000000">
             <label class="controls__label" for="size">Размер кисти:</label>
             <input class="controls__input" type="range" id="size" min="1" max="50" value="10">
+            <button class="controls__button" id="fillButton">Залить</button>
+            <button class="controls__button" id="saveButton">Сохранить</button>
             <button class="controls__button" id="clearButton">Очистить</button>
         </div>
         <canvas id="drawingCanvas"></canvas>
     </div>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Имя пользователя" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
     <script src="/main.js"></script>
 </body>
 </html>

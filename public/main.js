@@ -1,4 +1,5 @@
 import '../pages/index.css';
+import avatarImg from '../images/default.png';
 
 class DrawingApp {
     constructor(canvasId, colorInputId, sizeInputId, fillButtonId, saveButtonId, clearButtonId, loginButtonId) {
@@ -10,6 +11,14 @@ class DrawingApp {
         this.saveButton = document.getElementById(saveButtonId);
         this.clearButton = document.getElementById(clearButtonId);
         this.loginButton = document.getElementById(loginButtonId);
+        this.avatar = document.getElementById('avatar');
+        this.nickname = document.getElementById('nickname');
+        this.userInfo = document.getElementById('userInfo');
+        this.logoutButton = document.getElementById('logoutButton');
+        this.cancelButton = document.getElementById('cancelButton');
+        this.searchForm = document.getElementById('searchForm');
+        this.searchUsername = document.getElementById('searchUsername');
+        this.searchResults = document.getElementById('searchResults');
 
         this.isDrawing = false;
         this.lastX = 0;
@@ -24,30 +33,205 @@ class DrawingApp {
     }
 
     init() {
+        console.log('Initializing DrawingApp...');
         this.setCanvasSize();
         this.addEventListeners();
         this.loadDrawingData();
         this.styleButtons();
+        this.loadUserInfo(); // Загружаем информацию о пользователе при инициализации
         this.loginButton.addEventListener('click', this.showLoginForm.bind(this)); // Добавляем обработчик для кнопки "Войти"
+        this.cancelButton.addEventListener('click', this.hideLoginForm.bind(this)); // Добавляем обработчик для кнопки "Отмена"
+        this.handleLogin(); // Добавляем обработчик для формы входа
+        this.avatar.addEventListener('click', this.toggleLogoutButton.bind(this)); // Добавляем обработчик для клика на аватар
+        this.logoutButton.addEventListener('click', this.logout.bind(this)); // Добавляем обработчик для кнопки выхода
+        this.searchForm.addEventListener('submit', this.handleSearch.bind(this)); // Добавляем обработчик для формы поиска
+    }
+
+    setCanvasSize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight - document.querySelector('.header').offsetHeight;
+    }
+
+    addEventListeners() {
+        this.canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+        this.canvas.addEventListener('mousemove', this.draw.bind(this));
+        this.canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+        this.canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
+        this.fillButton.addEventListener('click', this.fillCanvas.bind(this));
+        this.saveButton.addEventListener('click', this.saveDrawing.bind(this));
+        this.clearButton.addEventListener('click', this.clearCanvas.bind(this));
+    }
+
+    loadDrawingData() {
+        // Загрузка данных рисунка из localStorage или другого источника
+    }
+
+    styleButtons() {
+        // Стилизация кнопок
     }
 
     showLoginForm() {
+        console.log('Showing login form...');
         const loginForm = document.getElementById('loginForm');
         loginForm.style.display = 'block'; // Показываем форму
-    
-        // Добавляем обработчик события для закрытия формы при отправке
+    }
+
+    hideLoginForm() {
+        console.log('Hiding login form...');
+        const loginForm = document.getElementById('loginForm');
+        loginForm.style.display = 'none'; // Скрываем форму
+    }
+
+    handleLogin() {
+        const loginForm = document.getElementById('loginForm');
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault(); // Предотвращаем стандартное поведение формы
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-    
+
             // Здесь можно добавить логику для проверки данных формы
             console.log(`Username: ${username}, Password: ${password}`);
-    
+
+            // Сохраняем информацию о пользователе в localStorage
+            localStorage.setItem('username', username);
+            localStorage.setItem('avatar', avatarImg); // Укажите путь к аватару
+
+            // Заменяем кнопку "Войти" на информацию о пользователе
+            this.loginButton.style.display = 'none';
+            this.avatar.src = localStorage.getItem('avatar');
+            this.nickname.textContent = localStorage.getItem('username');
+            this.userInfo.style.display = 'flex';
+            this.searchForm.style.display = 'block'; // Показываем форму поиска
+
             loginForm.style.display = 'none'; // Скрываем форму после отправки
         });
     }
-    
+
+    loadUserInfo() {
+        const username = localStorage.getItem('username');
+        const avatar = localStorage.getItem('avatar');
+
+        if (username && avatar) {
+            console.log('User info loaded from localStorage');
+            this.loginButton.style.display = 'none';
+            this.avatar.src = avatar;
+            this.nickname.textContent = username;
+            this.userInfo.style.display = 'flex';
+            this.searchForm.style.display = 'block'; // Показываем форму поиска
+        }
+    }
+
+    toggleLogoutButton() {
+        console.log('Avatar clicked, toggling logout button');
+        if (this.logoutButton.style.display === 'none' || this.logoutButton.style.display === '') {
+            this.logoutButton.style.display = 'block';
+            console.log('1');
+        } else {
+            this.logoutButton.style.display = 'none';
+            console.log('0');
+        }
+    }
+
+    logout() {
+        console.log('Logging out user...');
+        // Очищаем данные пользователя из localStorage
+        localStorage.removeItem('username');
+        localStorage.removeItem('avatar');
+
+        // Скрываем информацию о пользователе и показываем кнопку "Войти"
+        this.loginButton.style.display = 'block';
+        this.avatar.src = '';
+        this.nickname.textContent = '';
+        this.userInfo.style.display = 'none';
+        this.logoutButton.style.display = 'none';
+        this.searchForm.style.display = 'none'; // Скрываем форму поиска
+        this.searchResults.style.display = 'none'; // Скрываем результаты поиска
+    }
+
+    handleSearch(e) {
+        e.preventDefault(); // Предотвращаем стандартное поведение формы
+        const searchValue = this.searchUsername.value.trim();
+
+        if (!searchValue) {
+            alert('Введите никнейм для поиска');
+            return;
+        }
+
+        // Здесь можно добавить логику для выполнения поиска по никнейму
+        // Например, отправка запроса на сервер для получения результатов поиска
+        console.log(`Searching for user: ${searchValue}`);
+
+        // Пример статических результатов поиска
+        const searchResults = [
+            { username: 'user1', avatar: 'path/to/user1.jpg' },
+            { username: 'user2', avatar: 'path/to/user2.jpg' },
+            { username: 'user3', avatar: 'path/to/user3.jpg' }
+        ];
+
+        this.displaySearchResults(searchResults);
+    }
+
+    displaySearchResults(results) {
+        this.searchResults.innerHTML = ''; // Очищаем предыдущие результаты
+
+        if (results.length === 0) {
+            this.searchResults.innerHTML = '<p>Нет результатов по вашему запросу</p>';
+            return;
+        }
+
+        results.forEach(user => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'search-result';
+
+            const avatarImg = document.createElement('img');
+            avatarImg.className = 'search-avatar';
+            avatarImg.src = user.avatar;
+            avatarImg.alt = user.username;
+
+            const nicknameSpan = document.createElement('span');
+            nicknameSpan.className = 'search-nickname';
+            nicknameSpan.textContent = user.username;
+
+            const sendRequestButton = document.createElement('button');
+            sendRequestButton.className = 'controls__button search-button';
+            sendRequestButton.textContent = 'Отправить запрос';
+            sendRequestButton.addEventListener('click', () => this.sendFriendRequest(user.username));
+
+            resultDiv.appendChild(avatarImg);
+            resultDiv.appendChild(nicknameSpan);
+            resultDiv.appendChild(sendRequestButton);
+
+            this.searchResults.appendChild(resultDiv);
+        });
+
+        this.searchResults.style.display = 'block'; // Показываем результаты поиска
+    }
+
+    sendFriendRequest(username) {
+        console.log(`Sending friend request to: ${username}`);
+        // Здесь можно добавить логику для отправки запроса другому пользователю
+        alert(`Запрос отправлен пользователю ${username}`);
+    }
+
+
+
+    fillCanvas() {
+        this.ctx.fillStyle = this.colorInput.value;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    saveDrawing() {
+        const dataURL = this.canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = 'drawing.png';
+        link.click();
+    }
+
+    clearCanvas() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
     setCanvasSize() {
         this.canvas.width = window.innerWidth - 50;
         this.canvas.height = window.innerHeight - 200;

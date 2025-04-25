@@ -9,6 +9,16 @@
 <body>
     <div class="header">
         <button class="controls__button" id="loginButton">Войти</button>
+        <div class="user-info" id="userInfo" style="display:none;">
+            <img class="avatar" id="avatar" src="" alt="Аватар">
+            <span class="nickname" id="nickname"></span>
+            <button class="controls__button" id="logoutButton" style="display:none;">Выход</button>
+        </div>
+        <form id="searchForm" style="display:none;">
+            <input type="text" id="searchUsername" placeholder="Поиск по никнейму" required>
+            <button type="submit">Найти</button>
+        </form>
+        <div id="searchResults" style="display:none;"></div>
     </div>
     <div class="body">
         <div class="controls">
@@ -26,6 +36,7 @@
         <input type="text" id="username" placeholder="Имя пользователя" required>
         <input type="password" id="password" placeholder="Пароль" required>
         <button type="submit">Войти</button>
+        <button type="button" id="cancelButton">Отмена</button>
     </form>
     <script src="/main.js"></script>
 </body>
